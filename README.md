@@ -37,6 +37,6 @@ Criar e configurar um servidor web na **AWS EC2** utilizando **Amazon Linux 2023
 
 Ao acessar o **IP público** da instância EC2 no navegador, obtive a seguinte página:
 
-![Servidor EC2](./images/servidor-ec2.png)
+![Servidor EC2](.images/servidor-ec2.jpg)
 
 
