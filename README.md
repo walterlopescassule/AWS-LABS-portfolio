@@ -1,6 +1,6 @@
 # AWS-LABS-portfolio
 Laboratórios práticos realizados em AWS
-# 🚀 Laboratório AWS EC2 - Meu Primeiro Servidor Web
+# 🚀 Laboratório 1: AWS EC2 - Meu Primeiro Servidor Web
 
 Este repositório documenta meu primeiro laboratório prático como **AWS Developer**, onde configurei e hospedei uma aplicação simples utilizando **Amazon EC2**.
 
@@ -37,11 +37,11 @@ Criar e configurar um servidor web na **AWS EC2** utilizando **Amazon Linux 2023
 
 Ao acessar o **IP público** da instância EC2 no navegador, obtive a seguinte página:
 
-![Servidor EC2](.images/servidor-ec2.jpg)
+![Image](https://github.com/user-attachments/assets/ff665e7d-b699-4e00-a9c0-cc9dcd8bf26e)
 
 ---
 
-# Laboratório: AWS Budgets – Controle de Custos
+# Laboratório 2: AWS Budgets – Controle de Custos
 
 ## 🎯 Objetivo
 Configurar um orçamento simples para controlar gastos na conta AWS e receber alertas por e-mail.
@@ -61,151 +61,17 @@ Configurar um orçamento simples para controlar gastos na conta AWS e receber al
 - Controle proativo de custos habilitado.
 
 ## 📸 Prints
-![Exemplo do orçamento criado](./screenshot-budget.png)
+![Image](https://github.com/user-attachments/assets/f49c5d0a-dbf8-4572-a27b-450ac0bdcce2)
 
 ---
 
-# 🚀 Laboratório AWS Lambda + IAM + EventBridge
-
-Este laboratório demonstra como **automatizar o encerramento de instâncias EC2** usando três serviços da AWS: **IAM (segurança), Lambda (automação)** e **EventBridge (gatilhos/eventos)**.
-
----
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Laboratório AWS Lambda + IAM + EventBridge</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        h1, h2, h3 {
-            color: #2c3e50;
-        }
-        pre {
-            background-color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        code {
-            font-family: monospace;
-        }
-        .section {
-            margin-bottom: 40px;
-        }
-        img {
-            max-width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-
-<h1>🚀 Laboratório AWS Lambda + IAM + EventBridge</h1>
+<h1>🚀 Laboratório 3: AWS Lambda + IAM + EventBridge</h1>
 <p>Este laboratório demonstra como <strong>automatizar o encerramento de instâncias EC2</strong> usando três serviços da AWS: <strong>IAM (segurança), Lambda (automação)</strong> e <strong>EventBridge (gatilhos/eventos)</strong>.</p>
 
-<div class="section">
-    <h2>🔹 Etapas do Laboratório</h2>
+![Image](https://github.com/user-attachments/assets/99d1c3ca-5a39-4dd9-be44-ddf063188a18)
+![Image](https://github.com/user-attachments/assets/a02342e4-1f07-48c5-8d8a-0f74421ca668)
 
-    <h3>1. Criar Política IAM</h3>
-    <p>Acesse <strong>IAM → Políticas → Criar política</strong>. Escolha o editor JSON e cole o código:</p>
-    <pre><code>{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:CreateLogGroup",
-        "logs:PutLogEvents",
-        "ec2:DescribeInstances",
-        "ec2:TerminateInstances",
-        "ec2:DescribeRegions"
-      ],
-      "Resource": "*"
-    }
-  ]
-}</code></pre>
-    <p>Nome da política: <strong>PoliticaTerminarEC2-WalterCassule</strong> → Criar ✅</p>
 
-    <h3>2. Criar Função (Role) no IAM</h3>
-    <ul>
-        <li>IAM → Funções → Criar função</li>
-        <li>Tipo de entidade confiável: <strong>Serviço da AWS → Lambda</strong></li>
-        <li>Anexe a política criada <strong>PoliticaTerminarEC2-WalterCassule</strong></li>
-        <li>Nome da função: <strong>RoleTerminarEC2-WalterCassule</strong></li>
-        <li>Criar ✅</li>
-    </ul>
-
-    <h3>3. Criar Função Lambda</h3>
-    <ul>
-        <li>Acesse AWS Lambda → Criar função → Criar do zero</li>
-        <li>Nome: <strong>LambdaTerminarEC2-WalterCassule</strong></li>
-        <li>Runtime: <strong>Python 3.9</strong></li>
-        <li>Role existente: <strong>RoleTerminarEC2-WalterCassule</strong></li>
-    </ul>
-    <p>Código Python:</p>
-    <pre><code>import boto3
-
-def lambda_handler(event, context):
-    ec2 = boto3.client('ec2')
-    response = ec2.describe_instances(
-        Filters=[{"Name": "instance-state-name", "Values": ["running"]}]
-    )
-    
-    instances_to_terminate = []
-    for reservation in response["Reservations"]:
-        for instance in reservation["Instances"]:
-            instances_to_terminate.append(instance["InstanceId"])
-    
-    if instances_to_terminate:
-        ec2.terminate_instances(InstanceIds=instances_to_terminate)
-        return f"Encerradas instâncias: {instances_to_terminate}"
-    else:
-        return "Nenhuma instância em execução encontrada."</code></pre>
-    <p>Deploy ✅ | Timeout: 10s | Handler: <strong>Terminator.lambda_handler</strong></p>
-
-    <h3>4. Configurar EventBridge (gatilho)</h3>
-    <ul>
-        <li>Na função Lambda, clique em <strong>Adicionar gatilho</strong></li>
-        <li>Escolha <strong>EventBridge (CloudWatch Events)</strong></li>
-        <li>Criar nova regra:
-            <ul>
-                <li>Nome: <strong>GatilhoTerminarEC2-WalterCassule</strong></li>
-                <li>Tipo: Expressão de agendamento (ex: <code>rate(5 minutes)</code>)</li>
-            </ul>
-        </li>
-        <li>Adicionar ✅</li>
-    </ul>
-
-    <h3>5. Testar o Laboratório</h3>
-    <ol>
-        <li>Crie uma instância EC2 de teste</li>
-        <li>Aguarde o tempo definido no EventBridge</li>
-        <li>A função Lambda deve encerrar a instância automaticamente</li>
-    </ol>
-
-    <h3>6. Finalizar</h3>
-    <p>Para evitar cobranças, delete:</p>
-    <ul>
-        <li>Função Lambda</li>
-        <li>Role IAM</li>
-        <li>Política IAM</li>
-        <li>Regra EventBridge</li>
-    </ul>
-</div>
-
-<div class="section">
-    <h2>📸 Exemplo de Resultado</h2>
-    <p>Você pode adicionar uma imagem do fluxo do laboratório:</p>
-    <img src="./images/lambda-lab.jpg" alt="Fluxo Lambda + EventBridge + EC2">
-</div>
 
 <div class="section">
     <h2>✍️ Aprendizados</h2>
@@ -220,5 +86,60 @@ def lambda_handler(event, context):
 </body>
 </html>
 
+---
+
+# 📬 Laboratório 4: AWS – SNS + SQS + DLQ
+
+Este projeto demonstra o uso do **Amazon SNS** como barramento de eventos, integrado a uma **fila SQS principal** com suporte a **Dead-Letter Queue (DLQ)**.  
+O objetivo é simular um fluxo de mensagens resiliente em uma arquitetura baseada em microsserviços.
+
+---
+
+## 🎯 Objetivos
+
+- Criar uma **fila SQS DLQ** (Dead-Letter Queue)  
+- Criar uma **fila SQS principal** configurada para redirecionar mensagens para a DLQ  
+- Criar um **tópico SNS** e associá-lo à fila SQS principal  
+- Testar a publicação de mensagens via SNS e verificar o consumo pela SQS  
+- Simular falhas de processamento para redirecionar mensagens à DLQ  
+
+---
+
+## 🏗️ Arquitetura
+
+![Image](https://github.com/user-attachments/assets/96b7e0a4-6f9f-4339-b47b-dd84eef1aefd)
+---
+
+## ⚙️ Passo a Passo
+
+1. **Criação das filas SQS**  
+   - Criar a fila **DLQ**  
+   - Criar a fila **principal** e configurar a DLQ como destino de mensagens falhas  
+
+2. **Criação do tópico SNS**  
+   - Criar um tópico padrão  
+   - Copiar o ARN para uso posterior  
+
+3. **Assinatura da SQS no SNS**  
+   - Inscrever a fila principal no tópico SNS  
+   - Ajustar a **Policy da SQS** para permitir envio do SNS  
+
+4. **Teste de fluxo normal**  
+   - Publicar mensagem no **SNS**  
+   - Mensagem deve chegar na **fila principal (SQS)**  
+
+5. **Teste de falha (DLQ)**  
+   - Não processar a mensagem (deixar expirar tempo de visibilidade)  
+   - Após o número máximo de tentativas (ex: 3), a mensagem é enviada para a **DLQ**
+  
+ ![Image](https://github.com/user-attachments/assets/58d069db-2868-4e4f-a218-5006592fe2aa)
+![Image](https://github.com/user-attachments/assets/05efd60f-56e6-4b86-8e6c-c1155fec1340)  
+![Image](https://github.com/user-attachments/assets/048bed24-d229-42fe-97ab-15b1ab32686b)
+
+---
+
+## 🧪 Exemplo de Mensagem Publicada
+
+![Image](https://github.com/user-attachments/assets/9eb50a72-4f20-461e-8d80-195d657d9778)
 
 
